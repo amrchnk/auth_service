@@ -1,64 +1,30 @@
-/*package handler
+package handler
 
 import (
-	"encoding/json"
+	"context"
 	"github.com/amrchnk/auth_service/pkg/models"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-gonic/gin"
-	"net/http"
+	pb "github.com/amrchnk/auth_service/proto"
+	"github.com/spf13/cast"
 )
 
-func (h *Handler) signUp(c *gin.Context) {
+func (i *Implementation) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error){
 	var input models.User
-
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
-		return
+	input.Login,input.Password=req.Login,req.Password
+	id,err:=i.Service.CreateUser(input)
+	if err!=nil{
+		return nil, err
 	}
-
-	id, err := h.services.Authorization.CreateUser(input)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	input.Id = id
-	userSession, err := json.Marshal(input)
-	if err != nil {
-		return
-	}
-	session := sessions.Default(c)
-	session.Set("UserSession",userSession)
-	session.Save()
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	return &pb.SignUpResponse{
+		Slug: cast.ToInt64(id),
+	},nil
 }
 
-type signInRequest struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
+func (i *Implementation) SignIn(ctx context.Context, req *pb.SignInRequest) (*pb.SignInResponse, error){
+	user,err:=i.Service.CheckUser(req.Login,req.Password)
+	if err!=nil{
+		return nil, err
+	}
+	return &pb.SignInResponse{
+		Session: user,
+	},nil
 }
-
-func (h *Handler) signIn(c *gin.Context) {
-	var input signInRequest
-
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	userSession, err := h.services.Authorization.CheckUser(input.Login, input.Password)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	session := sessions.Default(c)
-	session.Set("UserSession", userSession)
-	session.Save()
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"session": userSession,
-	})
-}*/

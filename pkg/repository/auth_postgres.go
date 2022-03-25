@@ -5,6 +5,7 @@ import (
 	"github.com/amrchnk/auth_service/pkg/models"
 	"github.com/jmoiron/sqlx"
 	"log"
+	"time"
 )
 
 type AuthPostgres struct {
@@ -24,8 +25,8 @@ func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 
 	var id int
 
-	CreateUserQuery := fmt.Sprintf("INSERT INTO %s (login, password_hash) values ($1, $2) RETURNING id", usersTable)
-	row := tx.QueryRow(CreateUserQuery, user.Login, user.Password)
+	CreateUserQuery := fmt.Sprintf("INSERT INTO %s (login, password_hash,created_at) values ($1, $2, $3) RETURNING id", usersTable)
+	row := tx.QueryRow(CreateUserQuery, user.Login, user.Password,time.Now())
 	err = row.Scan(&id)
 	if err != nil {
 		log.Println("ERROR: ", err)

@@ -12,28 +12,30 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 )
 
-func init(){
-	err:=initConfig()
+func init() {
+	err := initConfig()
 	if err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
 
-	err = godotenv.Load(filepath.Join("../", ".env"));
+	err = godotenv.Load(filepath.Join("../", ".env"))
 	if err != nil {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 }
 
 func main() {
-	con,err:=net.Listen("tcp",":"+viper.GetString("port"))
-	if err!=nil{
-		log.Fatalf("tcp connection error: %v",err)
+	con, err := net.Listen("tcp", ":"+viper.GetString("port"))
+	if err != nil {
+		log.Fatalf("tcp connection error: %v", err)
 	}
 
-	grpcServer:=grpc.NewServer()
+	grpcServer := grpc.NewServer()
 
 	repo := repository.Config{
 		Host:     viper.GetString("db.host"),
@@ -50,11 +52,21 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 
-	pb.RegisterAuthServiceServer(grpcServer,handler.NewAuthService(services))
-	grpcServer.Serve(con)
+	pb.RegisterAuthServiceServer(grpcServer, handler.NewAuthService(services))
+	go func() {
+		if err := grpcServer.Serve(con); err != nil {
+			log.Fatalf("error occured while running http server: %s", err.Error())
+		}
+	}()
+	log.Printf("Auth service started at port :%s", viper.GetString("port"))
 
-	log.Print("Auth service started: ")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
 
+	if err := grpcServer.Stop; err != nil {
+		log.Fatal("Server has been stopped")
+	}
 	if err := db.Close(); err != nil {
 		log.Fatalf("error occured on db connection close: %s", err.Error())
 	}

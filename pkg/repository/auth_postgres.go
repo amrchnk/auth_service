@@ -54,5 +54,12 @@ func (r *AuthPostgres) GetUser(login, password string) (models.User, error) {
 		return user, err
 	}
 
+	query = fmt.Sprintf("SELECT role_id FROM %s WHERE user_id=$1", usersHaveRolesTable)
+	err = r.db.Get(&user, query, user.Id)
+	if err != nil {
+		log.Println("ERROR: ", err)
+		return user, err
+	}
+
 	return user, nil
 }

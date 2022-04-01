@@ -28,11 +28,13 @@ CREATE TABLE IF NOT EXISTS public.rules
 
 CREATE TABLE IF NOT EXISTS public.roles_have_rules
 (
-    user_id int REFERENCES public.users (id),
-    role_id int REFERENCES public.roles (id)
+    role_id int REFERENCES public.roles (id),
+    rule_id int REFERENCES public.rules (id)
 );
 
 INSERT INTO roles (id,role) VALUES (1,'Администратор'),(2,'Зарегистрированный пользователь');
+INSERT INTO rules (id,rule) VALUES (1,'Add user'),(2,'Delete user'),(3,'Get user'),(4,'Get all users');
+INSERT INTO roles_have_rules (role_id,rule_id) VALUES (1,1),(1,2),(1,3),(1,4);
 
 -- +goose Down
 -- SQL in this section is executed when the migration is rolled back.

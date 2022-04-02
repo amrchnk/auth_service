@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	salt       = "hjqrhjqw124617ajfhajs"
+	salt = "hjqrhjqw124617ajfhajs"
 )
 
 type AuthService struct {

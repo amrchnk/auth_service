@@ -52,7 +52,7 @@ func main() {
 	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 
-	pb.RegisterAuthServiceServer(grpcServer, handler.NewAuthService(services))
+	pb.RegisterAuthServiceServer(grpcServer, handler.NewService(services))
 	go func() {
 		if err := grpcServer.Serve(con); err != nil {
 			log.Fatalf("error occured while running http server: %s", err.Error())

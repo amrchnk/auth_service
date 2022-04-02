@@ -12,7 +12,7 @@ type Implementation struct {
 	mu sync.Mutex
 }
 
-func NewAuthService(s *service.Service)*Implementation{
+func NewService(s *service.Service)*Implementation{
 	return &Implementation{
 		Service:s,
 	}

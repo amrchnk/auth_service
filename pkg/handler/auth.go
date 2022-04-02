@@ -8,8 +8,12 @@ import (
 )
 
 func (i *Implementation) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error){
-	var input models.User
-	input.Login,input.Password=req.Login,req.Password
+	input:=models.User{
+		Login: req.User.Login,
+		Password: req.User.Password,
+		Username: req.User.Username,
+	}
+
 	id,err:=i.Service.CreateUser(input)
 	if err!=nil{
 		return nil, err

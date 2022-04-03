@@ -6,8 +6,8 @@ import (
 )
 
 type Authorization interface {
-	CheckUser(login, password string) (string, error)
 	CreateUser(user models.User) (int, error)
+	CheckUser(login, password string) (models.User, error)
 }
 
 type User interface {

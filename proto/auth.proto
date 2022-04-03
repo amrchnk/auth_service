@@ -56,7 +56,7 @@ message SignInRequest {
 }
 
 message SignInResponse {
-  string session = 1;
+  User user = 1;
 }
 
 // GET USER

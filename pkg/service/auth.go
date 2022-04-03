@@ -2,14 +2,13 @@ package service
 
 import (
 	"crypto/sha1"
-	"encoding/json"
 	"fmt"
 	"github.com/amrchnk/auth_service/pkg/models"
 	"github.com/amrchnk/auth_service/pkg/repository"
 )
 
 const (
-	salt = "hjqrhjqw124617ajfhajs"
+	salt       = "hjqrhjqw124617ajfhajs"
 )
 
 type AuthService struct {
@@ -25,18 +24,8 @@ func (s *AuthService) CreateUser(user models.User) (int, error) {
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) CheckUser(login, password string) (string, error) {
-	user, err := s.repo.GetUser(login, generatePasswordHash(password))
-	if err != nil {
-		return "", err
-	}
-
-	userSession, err := json.Marshal(user)
-	if err != nil {
-		return "", err
-	}
-
-	return string(userSession), nil
+func (s *AuthService) CheckUser(login, password string) (models.User, error) {
+	return s.repo.GetUser(login, generatePasswordHash(password))
 }
 
 func generatePasswordHash(password string) string {

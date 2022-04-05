@@ -14,6 +14,7 @@ type User interface {
 	GetUserById(id int64) (models.User, error)
 	DeleteUserById(id int64) (string, error)
 	GetAllUsers() ([]models.User, error)
+	UpdateUser(user models.User) (string, error)
 }
 
 type Service struct {

@@ -10,10 +10,11 @@ type Authorization interface {
 	GetUser(username, password string) (models.User, error)
 }
 
-type User interface{
+type User interface {
 	GetUserById(id int64) (models.User, error)
 	DeleteUserById(id int64) (string, error)
 	GetAllUsers() ([]models.User, error)
+	UpdateUser(user models.User) (string, error)
 }
 
 type Repository struct {
@@ -24,6 +25,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
-		User:NewUserPostgres(db),
+		User:          NewUserPostgres(db),
 	}
 }

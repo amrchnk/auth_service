@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/amrchnk/auth_service/pkg/models"
 	pb "github.com/amrchnk/auth_service/proto"
 )
 
@@ -33,6 +34,23 @@ func (i *Implementation) DeleteUserById(ctx context.Context, req *pb.DeleteUserB
 	}, err
 }
 
+func (i *Implementation) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+	userReq:=models.User{
+		Login: req.User.Login,
+		Id: req.User.Slug,
+		Password: req.User.Password,
+		Username: req.User.Username,
+		RoleId: req.User.UserRoleId,
+	}
+	resp,err := i.Service.UpdateUser(userReq)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateUserResponse{
+		Resp: resp,
+	}, err
+}
+
 func (i *Implementation) GetAllUsers(ctx context.Context,request *pb.GetAllUsersRequest) (*pb.GetAllUsersResponse, error) {
 	users, err := i.Service.GetAllUsers()
 	if err != nil {
@@ -54,3 +72,4 @@ func (i *Implementation) GetAllUsers(ctx context.Context,request *pb.GetAllUsers
 		User: usersResp,
 	}, err
 }
+

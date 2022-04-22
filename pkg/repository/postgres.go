@@ -28,7 +28,6 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 		log.Println("ERROR: ", err)
 		return nil, err
 	}
-	//defer db.Close()
 
 	err = db.Ping()
 	if err != nil {

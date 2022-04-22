@@ -10,9 +10,3 @@ services:
       - "POSTGRES_DB=auth_service"
     ports:
       - "5432:5432"
-  redis:
-    image: redis
-    restart: unless-stopped
-    container_name: cookie_redis
-    ports:
-      - "6379:6379"

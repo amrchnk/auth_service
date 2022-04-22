@@ -28,14 +28,14 @@ func (r *UserPostgres) GetUserById(id int64) (models.User, error) {
 	query := fmt.Sprintf("SELECT id, login, password_hash, username, created_at FROM %s WHERE id=$1", usersTable)
 	err := r.db.Get(&user, query, id)
 	if err != nil {
-		log.Println("ERROR: ", err)
+		log.Println("[ERROR]: ", err)
 		return user, err
 	}
 
 	query = fmt.Sprintf("SELECT role_id FROM %s WHERE user_id=$1", usersHaveRolesTable)
 	err = r.db.Get(&user, query, user.Id)
 	if err != nil {
-		log.Println("ERROR: ", err)
+		log.Println("[ERROR]: ", err)
 		return user, err
 	}
 
@@ -49,8 +49,8 @@ func (r *UserPostgres) DeleteUserById(id int64) (string, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", usersTable)
 	_, err := r.db.Exec(query, id)
 	if err != nil {
-		log.Println("ERROR: ", err)
-		return "ERROR: ", err
+		log.Println("[ERROR]: ", err)
+		return "", err
 	}
 
 	return fmt.Sprintf("User with id = %d was deleted successfully", id), nil
@@ -90,8 +90,8 @@ func (r *UserPostgres) UpdateUser(user models.User) (string, error) {
 
 	_, err := r.db.Exec(query, args...)
 	if err != nil {
-		log.Println("ERROR: ", err)
-		return "ERROR: ", err
+		log.Println("[ERROR]: ", err)
+		return "", err
 	}
 
 	if user.RoleId != 0 {
@@ -100,8 +100,8 @@ func (r *UserPostgres) UpdateUser(user models.User) (string, error) {
 
 		_, err = r.db.Exec(query, user.RoleId, user.Id)
 		if err != nil {
-			log.Println("ERROR: ", err)
-			return "ERROR: ", err
+			log.Println("[ERROR]: ", err)
+			return "", err
 		}
 	}
 
@@ -117,7 +117,7 @@ func (r *UserPostgres) GetAllUsers() ([]models.User, error) {
 	query := fmt.Sprintf("SELECT id, login, username, password_hash, created_at, role_id FROM %s u LEFT JOIN %s uhr on u.id=uhr.user_id", usersTable, usersHaveRolesTable)
 	err := r.db.Select(&users, query)
 	if err != nil {
-		log.Println("ERROR: ", err)
+		log.Println("", err)
 		return users, err
 	}
 

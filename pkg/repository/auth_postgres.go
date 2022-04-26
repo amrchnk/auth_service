@@ -31,12 +31,14 @@ func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 	CreateUserQuery := fmt.Sprintf("INSERT INTO %s (login, username, password_hash, created_at) values ($1, $2, $3, $4) RETURNING id", usersTable)
 	row := tx.QueryRow(CreateUserQuery, user.Login,user.Username, user.Password,time.Now())
 	err = row.Scan(&id)
-	if strings.Contains(err.Error(),"duplicate key value"){
-		log.Printf("[ERROR]: %v", err)
-		tx.Rollback()
-		return 0, errors.New("user already exist")
-	}
+
 	if err != nil {
+		if strings.Contains(err.Error(),"duplicate key value"){
+			log.Printf("[ERROR]: %v", err)
+			tx.Rollback()
+			return 0, errors.New("user already exist")
+		}
+
 		log.Printf("[ERROR]: %v", err)
 		tx.Rollback()
 		return 0, err

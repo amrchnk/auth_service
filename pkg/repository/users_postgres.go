@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/amrchnk/auth_service/pkg/models"
 	"github.com/jmoiron/sqlx"
@@ -25,9 +27,12 @@ func (r *UserPostgres) GetUserById(id int64) (models.User, error) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	query := fmt.Sprintf("SELECT id, login, password_hash, username, created_at FROM %s WHERE id=$1", usersTable)
+	query := fmt.Sprintf("SELECT id, login, password_hash, username, created_at, profile_image FROM %s WHERE id=$1", usersTable)
 	err := r.db.Get(&user, query, id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return user, nil
+		}
 		log.Println("[ERROR]: ", err)
 		return user, err
 	}
@@ -83,10 +88,16 @@ func (r *UserPostgres) UpdateUser(user models.User) (string, error) {
 		argId++
 	}
 
+	if user.ProfileImage != "" {
+		setValues = append(setValues, fmt.Sprintf("profile_image=$%d", argId))
+		args = append(args, user.ProfileImage)
+		argId++
+	}
+
 	setQuery := strings.Join(setValues, ", ")
 
 	query := fmt.Sprintf(`UPDATE %s ut SET %s WHERE ut.id = %d`,
-		usersTable, setQuery,user.Id)
+		usersTable, setQuery, user.Id)
 
 	_, err := r.db.Exec(query, args...)
 	if err != nil {
@@ -114,7 +125,7 @@ func (r *UserPostgres) GetAllUsers() ([]models.User, error) {
 
 	var users []models.User
 
-	query := fmt.Sprintf("SELECT id, login, username, password_hash, created_at, role_id FROM %s u LEFT JOIN %s uhr on u.id=uhr.user_id", usersTable, usersHaveRolesTable)
+	query := fmt.Sprintf("SELECT id, login, username, password_hash, created_at, profile_image, role_id FROM %s u LEFT JOIN %s uhr on u.id=uhr.user_id", usersTable, usersHaveRolesTable)
 	err := r.db.Select(&users, query)
 	if err != nil {
 		log.Println("", err)

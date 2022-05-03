@@ -28,8 +28,8 @@ func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 
 	var id int
 
-	CreateUserQuery := fmt.Sprintf("INSERT INTO %s (login, username, password_hash, created_at) values ($1, $2, $3, $4) RETURNING id", usersTable)
-	row := tx.QueryRow(CreateUserQuery, user.Login,user.Username, user.Password,time.Now())
+	CreateUserQuery := fmt.Sprintf("INSERT INTO %s (login, username, password_hash, created_at,profile_image) values ($1, $2, $3, $4,$5) RETURNING id", usersTable)
+	row := tx.QueryRow(CreateUserQuery, user.Login,user.Username, user.Password,time.Now(),defaultAvatarUrl)
 	err = row.Scan(&id)
 
 	if err != nil {
@@ -58,7 +58,7 @@ func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 func (r *AuthPostgres) GetUser(login, password string) (models.User, error) {
 	var user models.User
 
-	query := fmt.Sprintf("SELECT id,login,password_hash,created_at FROM %s WHERE login=$1 AND password_hash=$2", usersTable)
+	query := fmt.Sprintf("SELECT id,login,password_hash,created_at,profile_image FROM %s WHERE login=$1 AND password_hash=$2", usersTable)
 	err := r.db.Get(&user, query, login, password)
 	if err != nil {
 		log.Println("[ERROR]: ", err)

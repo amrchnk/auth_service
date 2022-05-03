@@ -9,6 +9,8 @@ import (
 const (
 	usersTable          = "users"
 	usersHaveRolesTable = "users_have_roles"
+
+	defaultAvatarUrl = "https://res.cloudinary.com/disfhw1xf/image/upload/v1651590413/design_app/avatars/defaut_profile_image_xqvcqa.png"
 )
 
 type Config struct {

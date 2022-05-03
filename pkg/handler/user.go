@@ -18,6 +18,7 @@ func (i *Implementation) GetUserById(ctx context.Context, req *pb.GetUserByIdReq
 		Password:   user.Password,
 		Username:   user.Username,
 		UserRoleId: user.RoleId,
+		ProfileImage: user.ProfileImage,
 	}
 	return &pb.GetUserByIdResponse{
 		User: &userResp,
@@ -40,6 +41,7 @@ func (i *Implementation) UpdateUser(ctx context.Context, req *pb.UpdateUserReque
 		Id: req.User.Slug,
 		Password: req.User.Password,
 		Username: req.User.Username,
+		ProfileImage: req.User.ProfileImage,
 		RoleId: req.User.UserRoleId,
 	}
 	resp,err := i.Service.UpdateUser(userReq)
@@ -65,6 +67,7 @@ func (i *Implementation) GetAllUsers(ctx context.Context,request *pb.GetAllUsers
 			Password:   users[i].Password,
 			Username:   users[i].Username,
 			UserRoleId: users[i].RoleId,
+			ProfileImage: users[i].ProfileImage,
 		})
 	}
 
